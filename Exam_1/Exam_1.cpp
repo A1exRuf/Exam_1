@@ -1,100 +1,97 @@
 ﻿#include <iostream>
-#include <list>
 #include <string>
 
-using namespace std;
+class Node {
+public:
+    int data;
+    Node* next;
+};
 
 class Stack {
 private:
-    list<int> l;
-    int c_size;
+    Node* top;
+    int size;
+
 public:
-    Stack()
-    {
-        c_size = 0;
-    }
-    Stack(Stack &s)
-    {
-        this->l = s.l;
-        this->c_size = s.c_size;
-    }
-    ~Stack()
-    {
+    Stack() : top(nullptr), size(0) {}
 
-    }
-    void push(int value)
-    {
-        c_size++;
-        l.push_front(value);
-    }
-
-    void pop()
-    {
-        if (c_size <= 0) {
-            
-            cout << "Stack empty" << endl;
-        }
-        else {
-            c_size--;
-            l.pop_front();
+    ~Stack() {
+        while (!isEmpty()) {
+            pop();
         }
     }
 
-    int top() { return l.front(); }
-    int size()
-    {
-        return c_size;
-    }
-    void mergeStack(Stack& otherStack)
-    {
-        while (otherStack.c_size > 0) {
-            int element = otherStack.top();
-            otherStack.pop();
-            push(element);
+    Stack(const Stack& other) : top(nullptr), size(0) {
+        Node* temp = other.top;
+        while (temp != nullptr) {
+            push(temp->data);
+            temp = temp->next;
         }
     }
-    void printStack()
-    {
-        cout << "Elements in stack: ";
-        for (int element : l) {
-            cout << element << " ";
+
+    void push(int data) {
+        Node* newNode = new Node();
+        newNode->data = data;
+        newNode->next = top;
+        top = newNode;
+        size++;
+    }
+
+    int pop() {
+        Node* temp = top;
+        top = top->next;
+        int poppedValue = temp->data;
+        delete temp;
+        size--;
+        return poppedValue;
+    }
+
+    int peek() {
+        return top->data;
+    }
+
+    int getSize() {
+        return size;
+    }
+
+    bool isEmpty() {
+        return top == nullptr;
+    }
+
+    void addStack(Stack& other) {
+        while (!other.isEmpty()) {
+            push(other.pop());
         }
-        cout << endl;
     }
 };
-int main()
-{
-    string value;
-    int valueInt;
-    Stack s1;
-    Stack s2;
-    while (true)
-    {
-        cout << "Enter value: " << endl;
-        cin >> value;
-        if (value == "stop")
-        {
-            break;
+
+int main() {
+    Stack evenStack, oddStack;
+    std::string input;
+
+    std::cout << "Enter value:" << std::endl;
+    while (std::getline(std::cin, input) && !input.empty()) {
+        int value = std::stoi(input);
+        if (value % 2 == 0) {
+            evenStack.push(value);
         }
-        else
-        {
-            valueInt = stoi(value);
-        }
-        if (valueInt % 2 == 0) {
-            s1.push(valueInt);
-        }
-        else  {
-            s2.push(valueInt);
+        else {
+            oddStack.push(value);
         }
     }
-    if (s1.size() < s2.size())
-    {
-        s1.mergeStack(s2);
-        s1.printStack();
+
+    if (evenStack.getSize() < oddStack.getSize()) {
+        evenStack.addStack(oddStack);
+        while (!evenStack.isEmpty()) {
+            std::cout << evenStack.pop() << std::endl;
+        }
     }
-    else
-    {
-        s2.mergeStack(s1);
-        s2.printStack();
+    else {
+        oddStack.addStack(evenStack);
+        while (!oddStack.isEmpty()) {
+            std::cout << oddStack.pop() << std::endl;
+        }
     }
+
+    return 0;
 }
