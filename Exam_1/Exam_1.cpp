@@ -97,5 +97,4 @@ int main()
         s2.mergeStack(s1);
         s2.printStack();
     }
-    cout << "end";
 }
